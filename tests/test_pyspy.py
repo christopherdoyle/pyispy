@@ -30,6 +30,45 @@ class BaseTest:
     pass
 
 
+class TestFakeModuleInterface(BaseTest):
+    def test_inject_functions__no_functions__does_not_crash(
+        self, fake_module_interface
+    ):
+        fake_module_interface()
+
+    def test_inject_functions__with_function__is_attr(self, fake_module_interface):
+        def this_is_a_function():
+            pass
+
+        module = fake_module_interface([this_is_a_function])
+        assert hasattr(module, "this_is_a_function")
+
+    def test_inject_functions__with_multiple_functions__are_attrs(
+        self, fake_module_interface
+    ):
+        def function_one():
+            pass
+
+        def function_two():
+            pass
+
+        module = fake_module_interface([function_one, function_two])
+        assert hasattr(module, "function_one")
+        assert hasattr(module, "function_two")
+
+    def test_injected_functions__take_args_and_kwargs_and_return(
+        self, fake_module_interface
+    ):
+        def function(name, *a, flag=False, **kw):
+            return [a, flag]
+
+        module = fake_module_interface([function])
+
+        result = module.function("Chris", 5, 1729, flag=True, height=4)
+
+        assert result == [(5, 1729), True]
+
+
 class TestWiretapFunction(BaseTest):
     @staticmethod
     def wiretap_and_run(module, function_name) -> Queue:
