@@ -198,5 +198,65 @@ class TestWiretapClassMethod(BaseTest):
 
 
 class TestWiretapInstanceMethod(BaseTest):
+    @property
+    def testing_class(self):
+        class TestingClass:
+            def normal_method(self, *a, **kw):
+                return a, kw
 
-    pass
+            @staticmethod
+            def static_method(*a, **kw):
+                return a, kw
+
+            @classmethod
+            def class_method(cls, *a, **kw):
+                return a, kw
+
+        return TestingClass
+
+    @pytest.mark.parametrize(
+        "method_name", ("normal_method", "static_method", "class_method"),
+    )
+    def test_call_on_instance(self, method_name):
+        class_instance = self.testing_class()
+        logbook = Queue()
+        pyspy.wiretap_instance_method(class_instance, method_name, logbook)
+        method_handle = getattr(class_instance, method_name)
+        result = method_handle(1, 2, three=4)
+        assert result == ((1, 2), {"three": 4})
+        assert logbook.get_nowait().function_name == method_name
+
+    def test_classmethod_on_class__unaffected(self):
+        """We set the wiretap on an instance and check the cls.class_method is
+        not wiretapped.
+        """
+        class_obj = self.testing_class
+        class_instance = class_obj()
+        logbook = Queue()
+        pyspy.wiretap_instance_method(class_instance, "class_method", logbook)
+        class_obj.class_method()
+        assert logbook.empty
+
+    def test_wiretapped_instance__does_not_affect_other_instance(self):
+        # same class
+        class_obj = self.testing_class
+        # two instances
+        class_instance_one = class_obj()
+        class_instance_two = class_obj()
+
+        logbook = Queue()
+        pyspy.wiretap_instance_method(class_instance_one, "normal_method", logbook)
+
+        class_instance_two.normal_method()
+        assert logbook.empty
+
+    def test_wiretapped_instance__does_not_affect_new_instance(self):
+        class_obj = self.testing_class
+        class_instance_one = class_obj()
+
+        logbook = Queue()
+        pyspy.wiretap_instance_method(class_instance_one, "normal_method", logbook)
+
+        class_instance_two = class_obj()
+        class_instance_two.normal_method()
+        assert logbook.empty

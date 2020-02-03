@@ -87,4 +87,6 @@ def wiretap_class_method(class_obj, method_name: str, logbook: Queue) -> None:
 
 
 def wiretap_instance_method(o: object, method_name: str, logbook: Queue) -> None:
-    raise NotImplementedError()
+    function_handle = find_function_in_object(o, method_name)
+    wrapped_function = get_wiretapped_function(function_handle, logbook)
+    setattr(o, method_name, wrapped_function)
