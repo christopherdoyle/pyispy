@@ -123,3 +123,80 @@ class TestWiretapFunction(BaseTest):
         module.my_fun(**kwargs)
         report = logbook.get_nowait()
         assert report.function_kwargs == kwargs
+
+
+class TestWiretapClassMethod(BaseTest):
+    """In particular we are testing the behavior with self and cls arguments to
+    functions.
+
+    TODO Test on inherited classes
+    """
+
+    @property
+    def testing_class(self):
+        class TestingClass:
+            def normal_method(self, *a, **kw):
+                return a, kw
+
+            @staticmethod
+            def static_method(*a, **kw):
+                return a, kw
+
+            @classmethod
+            def class_method(cls, *a, **kw):
+                return a, kw
+
+        return TestingClass
+
+    @pytest.mark.parametrize(
+        "method_name", ("normal_method", "static_method", "class_method"),
+    )
+    def test_call_on_instance__no_wiretap(self, method_name):
+        """Sanity check for behavior of static/class methods before testing
+        said behavior with wiretapping.
+        """
+        class_obj = self.testing_class
+        class_instance = class_obj()
+        method_handle = getattr(class_instance, method_name)
+        result = method_handle(1, 2, three=4)
+        assert result == ((1, 2), {"three": 4})
+
+    @pytest.mark.parametrize(
+        "method_name", ("normal_method", "static_method", "class_method"),
+    )
+    def test_call_on_instance__instantiate_after_wiretap(self, method_name):
+        class_obj = self.testing_class
+        logbook = Queue()
+        pyspy.wiretap_class_method(class_obj, method_name, logbook)
+        class_instance = class_obj()
+        method_handle = getattr(class_instance, method_name)
+        result = method_handle(1, 2, three=4)
+        assert result == ((1, 2), {"three": 4})
+        assert logbook.get_nowait().function_name == method_name
+
+    @pytest.mark.parametrize(
+        "method_name", ("normal_method", "static_method", "class_method"),
+    )
+    def test_call_on_instance__instantiate_before_wiretap(self, method_name):
+        class_obj = self.testing_class
+        logbook = Queue()
+        class_instance = class_obj()
+        pyspy.wiretap_class_method(class_obj, method_name, logbook)
+        method_handle = getattr(class_instance, method_name)
+        result = method_handle(1, 2, three=4)
+        assert result == ((1, 2), {"three": 4})
+        assert logbook.get_nowait().function_name == method_name
+
+    def test_call_on_class__normal_method__raises(self):
+        """We are testing that the patched method still required a self"""
+        class_obj = self.testing_class
+        logbook = Queue()
+        pyspy.wiretap_class_method(class_obj, "normal_method", logbook)
+
+        with pytest.raises(Exception):
+            class_obj.normal_method()
+
+
+class TestWiretapInstanceMethod(BaseTest):
+
+    pass
