@@ -40,7 +40,7 @@ def get_wiretapped_function(function_handle: Callable, logbook: Queue) -> Callab
 
     def wrapped_function(*a, **kw):
         report(datetime.datetime.now(), *a, **kw)
-        return function_handle()
+        return function_handle(*a, **kw)
 
     return wrapped_function
 
