@@ -1,7 +1,16 @@
-from typing import Callable, Dict
-from types import ModuleType
-
+import datetime
+from dataclasses import dataclass
 from queue import Queue
+from types import ModuleType
+from typing import Callable, Dict, Tuple
+
+
+@dataclass
+class SpyReport:
+    call_time: datetime.datetime
+    function_name: str
+    function_args: Tuple
+    function_kwargs: Dict
 
 
 def find_function_in_module(module: ModuleType, function_name: str) -> Callable:
@@ -18,8 +27,19 @@ def find_function_in_module(module: ModuleType, function_name: str) -> Callable:
 
 
 def get_wiretapped_function(function_handle: Callable, logbook: Queue) -> Callable:
-    def wrapped_function():
-        logbook.put(f"{function_handle.__name__}")
+    function_name = function_handle.__name__
+
+    def report(timestamp, *a, **kw):
+        spy_report = SpyReport(
+            call_time=timestamp,
+            function_name=function_name,
+            function_args=a,
+            function_kwargs=kw,
+        )
+        logbook.put(spy_report)
+
+    def wrapped_function(*a, **kw):
+        report(datetime.datetime.now(), *a, **kw)
         return function_handle()
 
     return wrapped_function
