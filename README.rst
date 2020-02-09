@@ -29,18 +29,18 @@ Testing helper utility for monitoring calls to functions and methods (spying).
 Example
 -------
 
-```python
-import my_module
-import pyspy
+.. code-block:: python
 
-def my_ClassA():
-    reports = []
-    pyspy.wiretap(my_module.ClassA, ["__init__", "exec"], reports)
+    import my_module
+    import pyspy
 
-    obj = my_module.ClassA()
+    def my_ClassA():
+        reports = []
+        pyspy.wiretap(my_module.ClassA, ["__init__", "exec"], reports)
 
-    assert "__init__" in reports
-```
+        obj = my_module.ClassA()
+
+        assert "__init__" in reports
 
 
 TODO
