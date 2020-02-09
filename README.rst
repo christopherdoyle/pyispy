@@ -16,17 +16,42 @@ PySpy
 
 
 
- 
+
 
 
 * Free software: MIT license
 * Documentation: https://pyspy.readthedocs.io.
 
 
-Features
---------
+Testing helper utility for monitoring calls to functions and methods (spying).
 
-* TODO
+
+Example
+-------
+
+```python
+import my_module
+import pyspy
+
+def my_ClassA():
+    reports = []
+    pyspy.wiretap(my_module.ClassA, ["__init__", "exec"], reports)
+
+    obj = my_module.ClassA()
+
+    assert "__init__" in reports
+```
+
+
+TODO
+----
+
+* Refactor hooks as classes to contract input arguments (object, function name,
+  logbook) to support polymorphic attitude in ``process_request``.
+* Implement ``SpyReport == <function_name>``
+* Implement/test wiretap on magic methods
+    * Handle response to read-only functions (for example ``__add__`` in int type)
+
 
 Credits
 -------

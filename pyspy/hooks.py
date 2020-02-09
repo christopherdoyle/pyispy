@@ -24,6 +24,18 @@ def is_class_method(cls, method_name):
 
 
 def find_function_in_object(o: object, function_name: str) -> Callable:
+    """Finds a callable object matching given function name in given object.
+
+    Args:
+        o: Any object.
+        function_name: Name of attribute within o.
+
+    Returns:
+        Callable object with name <function_name> in object <o>.
+
+    Raises:
+        LookupError: if <function_Name> is not a callable object in <o>.
+    """
     try:
         function_handle = getattr(o, function_name)
         if not hasattr(function_handle, "__call__"):

@@ -4,7 +4,8 @@ from typing import Callable, Sequence
 
 import pytest
 
-from pyspy import pyspy
+from pyspy import hooks
+from . import BaseTest
 
 
 @pytest.fixture
@@ -24,10 +25,6 @@ def fake_module_interface():
     sys.modules[name] = FakeTestingModule
     yield inject_functions
     del sys.modules[name]
-
-
-class BaseTest:
-    pass
 
 
 class TestFakeModuleInterface(BaseTest):
@@ -73,7 +70,7 @@ class TestWiretapFunction(BaseTest):
     @staticmethod
     def wiretap_and_run(module, function_name) -> Queue:
         logbook = Queue()
-        pyspy.wiretap_function(module, function_name, logbook)
+        hooks.wiretap_function(module, function_name, logbook)
         module.my_fun()
         return logbook
 
@@ -86,7 +83,7 @@ class TestWiretapFunction(BaseTest):
     def test_logbook_contains_correct_type(self, fake_module_interface):
         logbook = self.wiretap_and_run(fake_module_interface(), "my_fun")
         entry = logbook.get_nowait()
-        assert isinstance(entry, pyspy.SpyReport)
+        assert isinstance(entry, hooks.SpyReport)
 
     def test_wiretapped_function__returns_correct_return_value(
         self, fake_module_interface
@@ -96,7 +93,7 @@ class TestWiretapFunction(BaseTest):
 
         module = fake_module_interface([my_fun])
         logbook = Queue()
-        pyspy.wiretap_function(module, "my_fun", logbook)
+        hooks.wiretap_function(module, "my_fun", logbook)
         result = module.my_fun()
         assert result == 5
 
@@ -106,7 +103,7 @@ class TestWiretapFunction(BaseTest):
 
         module = fake_module_interface([my_fun])
         logbook = Queue()
-        pyspy.wiretap_function(module, "my_fun", logbook)
+        hooks.wiretap_function(module, "my_fun", logbook)
         args = ("Reyes", 78, 205)
         module.my_fun(*args)
         report = logbook.get_nowait()
@@ -118,7 +115,7 @@ class TestWiretapFunction(BaseTest):
 
         module = fake_module_interface([my_fun])
         logbook = Queue()
-        pyspy.wiretap_function(module, "my_fun", logbook)
+        hooks.wiretap_function(module, "my_fun", logbook)
         kwargs = {"flag": True}
         module.my_fun(**kwargs)
         report = logbook.get_nowait()
@@ -167,7 +164,7 @@ class TestWiretapClassMethod(BaseTest):
     def test_call_on_instance__instantiate_after_wiretap(self, method_name):
         class_obj = self.testing_class
         logbook = Queue()
-        pyspy.wiretap_class_method(class_obj, method_name, logbook)
+        hooks.wiretap_class_method(class_obj, method_name, logbook)
         class_instance = class_obj()
         method_handle = getattr(class_instance, method_name)
         result = method_handle(1, 2, three=4)
@@ -181,7 +178,7 @@ class TestWiretapClassMethod(BaseTest):
         class_obj = self.testing_class
         logbook = Queue()
         class_instance = class_obj()
-        pyspy.wiretap_class_method(class_obj, method_name, logbook)
+        hooks.wiretap_class_method(class_obj, method_name, logbook)
         method_handle = getattr(class_instance, method_name)
         result = method_handle(1, 2, three=4)
         assert result == ((1, 2), {"three": 4})
@@ -191,7 +188,7 @@ class TestWiretapClassMethod(BaseTest):
         """We are testing that the patched method still required a self"""
         class_obj = self.testing_class
         logbook = Queue()
-        pyspy.wiretap_class_method(class_obj, "normal_method", logbook)
+        hooks.wiretap_class_method(class_obj, "normal_method", logbook)
 
         with pytest.raises(Exception):
             class_obj.normal_method()
@@ -220,7 +217,7 @@ class TestWiretapInstanceMethod(BaseTest):
     def test_call_on_instance(self, method_name):
         class_instance = self.testing_class()
         logbook = Queue()
-        pyspy.wiretap_instance_method(class_instance, method_name, logbook)
+        hooks.wiretap_instance_method(class_instance, method_name, logbook)
         method_handle = getattr(class_instance, method_name)
         result = method_handle(1, 2, three=4)
         assert result == ((1, 2), {"three": 4})
@@ -233,7 +230,7 @@ class TestWiretapInstanceMethod(BaseTest):
         class_obj = self.testing_class
         class_instance = class_obj()
         logbook = Queue()
-        pyspy.wiretap_instance_method(class_instance, "class_method", logbook)
+        hooks.wiretap_instance_method(class_instance, "class_method", logbook)
         class_obj.class_method()
         assert logbook.empty
 
@@ -245,7 +242,7 @@ class TestWiretapInstanceMethod(BaseTest):
         class_instance_two = class_obj()
 
         logbook = Queue()
-        pyspy.wiretap_instance_method(class_instance_one, "normal_method", logbook)
+        hooks.wiretap_instance_method(class_instance_one, "normal_method", logbook)
 
         class_instance_two.normal_method()
         assert logbook.empty
@@ -255,7 +252,7 @@ class TestWiretapInstanceMethod(BaseTest):
         class_instance_one = class_obj()
 
         logbook = Queue()
-        pyspy.wiretap_instance_method(class_instance_one, "normal_method", logbook)
+        hooks.wiretap_instance_method(class_instance_one, "normal_method", logbook)
 
         class_instance_two = class_obj()
         class_instance_two.normal_method()
