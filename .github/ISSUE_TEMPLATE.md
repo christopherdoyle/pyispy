@@ -1,4 +1,4 @@
-* PySpy version:
+* PyISpy version:
 * Python version:
 * Operating System:
 

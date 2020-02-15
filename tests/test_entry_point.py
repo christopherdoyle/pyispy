@@ -1,6 +1,6 @@
 from queue import Queue
 
-import pyspy
+import pyispy
 from . import BaseTest
 
 
@@ -13,7 +13,7 @@ class TestWiretapEntryPoint(BaseTest):
         my_object = MyClass()
         function_names = ["f"]
         logbook = Queue()
-        pyspy.wiretap(my_object, function_names, logbook)
+        pyispy.wiretap(my_object, function_names, logbook)
 
         my_object.f(5)
 

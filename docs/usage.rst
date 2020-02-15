@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use PySpy in a project::
+To use PyISpy in a project::
 
-    import pyspy
+    import pyispy

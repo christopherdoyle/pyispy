@@ -5,7 +5,7 @@ from typing import Callable, Sequence
 
 import pytest
 
-from pyspy import hooks
+from pyispy import hooks
 from . import BaseTest
 
 

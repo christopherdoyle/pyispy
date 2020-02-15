@@ -1,16 +1,16 @@
 =====
-PySpy
+PyISpy
 =====
 
 
-.. image:: https://img.shields.io/pypi/v/pyspy.svg
-        :target: https://pypi.python.org/pypi/pyspy
+.. image:: https://img.shields.io/pypi/v/pyispy.svg
+        :target: https://pypi.python.org/pypi/pyispy
 
-.. image:: https://img.shields.io/travis/christopherdoyle/pyspy.svg
-        :target: https://travis-ci.org/christopherdoyle/pyspy
+.. image:: https://img.shields.io/travis/christopherdoyle/pyispy.svg
+        :target: https://travis-ci.org/christopherdoyle/pyispy
 
-.. image:: https://readthedocs.org/projects/pyspy/badge/?version=latest
-        :target: https://pyspy.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/pyispy/badge/?version=latest
+        :target: https://pyispy.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 
@@ -20,7 +20,7 @@ PySpy
 
 
 * Free software: MIT license
-* Documentation: https://pyspy.readthedocs.io.
+* Documentation: https://pyispy.readthedocs.io.
 
 
 Testing helper utility for monitoring calls to functions and methods (spying).
@@ -32,11 +32,11 @@ Example
 .. code-block:: python
 
     import my_module
-    import pyspy
+    import pyispy
 
     def my_ClassA():
         reports = []
-        pyspy.wiretap(my_module.ClassA, ["__init__", "exec"], reports)
+        pyispy.wiretap(my_module.ClassA, ["__init__", "exec"], reports)
 
         obj = my_module.ClassA()
 

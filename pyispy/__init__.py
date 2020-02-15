@@ -1,4 +1,4 @@
-"""Top-level package for PySpy."""
+"""Top-level package for PyISpy."""
 from queue import Queue
 from typing import List, Sequence, Union
 

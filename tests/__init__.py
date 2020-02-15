@@ -1,4 +1,4 @@
-"""Unit test package for pyspy."""
+"""Unit test package for pyispy."""
 
 
 class BaseTest:

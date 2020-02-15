@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=pyspy
+set SPHINXPROJ=pyispy
 
 if "%1" == "" goto help
 

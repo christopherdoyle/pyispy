@@ -1,4 +1,4 @@
-Welcome to PySpy's documentation!
+Welcome to PyISpy's documentation!
 ======================================
 
 .. toctree::
