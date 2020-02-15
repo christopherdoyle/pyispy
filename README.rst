@@ -1,6 +1,6 @@
-=====
+======
 PyISpy
-=====
+======
 
 
 .. image:: https://img.shields.io/pypi/v/pyispy.svg

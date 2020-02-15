@@ -5,7 +5,7 @@ from typing import List, Sequence, Union
 from . import main
 
 __author__ = """Christopher Doyle"""
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 
 
 def wiretap(
