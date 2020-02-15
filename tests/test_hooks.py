@@ -1,4 +1,5 @@
 import sys
+import datetime
 from queue import Queue
 from typing import Callable, Sequence
 
@@ -25,6 +26,56 @@ def fake_module_interface():
     sys.modules[name] = FakeTestingModule
     yield inject_functions
     del sys.modules[name]
+
+
+class TestSpyReport(BaseTest):
+    @property
+    def spy_report1(self):
+        return hooks.SpyReport(
+            call_time=datetime.datetime(2020, 2, 20),
+            function_name="Roger",
+            function_args=(1, 2),
+            function_kwargs={"a": [1]},
+        )
+
+    @property
+    def spy_report2(self):
+        return hooks.SpyReport(
+            call_time=datetime.datetime(2020, 2, 20),
+            function_name="Roger",
+            function_args=(1, 2),
+            function_kwargs={"a": [1]},
+        )
+
+    def test_eq__given_identical_report__is_equal(self):
+        assert self.spy_report1 == self.spy_report2
+
+    def test_eq__given_different_call_time__is_not_equal(self):
+        spy_report2 = self.spy_report2
+        spy_report2.call_time = spy_report2.call_time + datetime.timedelta(days=1)
+        assert self.spy_report1 != spy_report2
+
+    def test_eq__given_different_function_name__is_not_equal(self):
+        spy_report2 = self.spy_report2
+        spy_report2.function_name += " Daltrey"
+        assert self.spy_report1 != spy_report2
+
+    def test_eq__given_different_function_args__is_not_equal(self):
+        spy_report2 = self.spy_report2
+        spy_report2.function_args += (3, 4)
+        assert self.spy_report1 != spy_report2
+
+    def test_eq__given_different_function_kwargs__is_not_equal(self):
+        spy_report2 = self.spy_report2
+        spy_report2.function_kwargs["b"] = 10000
+        assert self.spy_report1 != spy_report2
+
+    def test_eq__to_function_name(self):
+        assert self.spy_report1 == "Roger"
+        assert self.spy_report1 != "Pete"
+
+    def test_eq__given_dictionary_with_same_values__not_equal(self):
+        assert self.spy_report1 != self.spy_report1.__dict__
 
 
 class TestFakeModuleInterface(BaseTest):

@@ -3,7 +3,7 @@ import inspect
 from dataclasses import dataclass
 from queue import Queue
 from types import ModuleType
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple, Union
 
 
 @dataclass
@@ -12,6 +12,25 @@ class SpyReport:
     function_name: str
     function_args: Tuple
     function_kwargs: Dict
+
+    def __eq__(self, other: Union[str, "SpyReport"]) -> bool:
+        """Allow comparison on function name, else compare to all fields. We
+        cannot call super() for equality because the dataclass decorator injects
+        the __eq__ function only if it's not present, not as a base.
+        """
+        if isinstance(other, str):
+            return self.function_name == other
+        elif not isinstance(other, SpyReport):
+            return False
+        else:
+            return all(
+                (
+                    self.call_time == other.call_time,
+                    self.function_name == other.function_name,
+                    self.function_args == other.function_args,
+                    self.function_kwargs == other.function_kwargs,
+                )
+            )
 
 
 def is_static_method(cls, method_name):
